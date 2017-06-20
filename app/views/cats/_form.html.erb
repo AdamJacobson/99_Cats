@@ -1,0 +1,19 @@
+<% _action = cat.id ? cat_url(cat) : cats_url %>
+<% _verb = cat.id ? "PATCH" : "POST" %>
+
+<form action="<%= _action %>" method="post">
+  <input type="hidden" name="_method" value="<%= _verb %>">
+  <label for="cat_name"></label>
+  <input type="text" name="cat[name]" id='cat_name' value="<%= cat.name %>">
+  <br>
+  M<input type="radio" name="cat[sex]" value="M" <%= 'checked' if cat.sex == 'M' %> >
+  F<input type="radio" name="cat[sex]" value="F" <%= 'checked' if cat.sex == 'F' %> >
+  <br>
+  <select name="cat[color]">
+    <option disabled selected>--Please Select Color--</option>
+    <%=  %>
+    <% cat.colors.each do |color| %>
+    <option value="<%=color%>"><%=color%></option>
+    <% end %>
+  </select>
+</form>
