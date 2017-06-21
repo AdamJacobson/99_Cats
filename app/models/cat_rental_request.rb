@@ -18,14 +18,34 @@ class CatRentalRequest < ApplicationRecord
     end
   end
 
+  def overlapping_pending_requests
+    overlapping_requests.where(status: 'PENDING')
+  end
+
   def overlapping_approved_requests
     overlapping_requests.where(status: 'APPROVED')
   end
 
   def does_not_overlap_approved_requests?
+    return if status == 'DENIED'
     unless overlapping_approved_requests.empty?
       errors[:base] << 'cat rented during that time'
     end
+  end
+
+  def pending?
+    status == 'PENDING'
+  end
+
+  def approve!
+    self.transaction do
+      self.update(status: 'APPROVED')
+      overlapping_pending_requests.each(&:deny!)
+    end
+  end
+
+  def deny!
+    self.update(status: 'DENIED')
   end
 
   def overlapping_requests
@@ -36,11 +56,5 @@ class CatRentalRequest < ApplicationRecord
          NOT( (start_date > :end_date) OR (end_date < :start_date) )
     SQL
   end
-
-
-
-  # def status
-  #   STATUS
-  # end
 
 end
